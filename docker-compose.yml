@@ -111,13 +111,6 @@ services:
     depends_on:
       - loki
 
-networks:
-  logger_net:
-
-volumes:
-  loki_data:
-  grafana_data:
-
 #Docker Networks
 networks:
   logger_net:
