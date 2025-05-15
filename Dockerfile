@@ -1,8 +1,7 @@
 ARG PHP=""
-# FROM php:${PHP_VERSION:+${PHP_VERSION}-}fpm
 FROM php:8.2-fpm
 
-MAINTAINER Evgeniy Yalovoy <e.yalovoy.job@gmail.com>
+MAINTAINER Kamaev Anton
 
 # Set working directory 
 WORKDIR /var/www
@@ -12,13 +11,13 @@ RUN apt-get update
 RUN apt-get install -y librdkafka-dev
 RUN apt-get install -y \
     exim4 \
-	librabbitmq-dev \
-	procps \
+    librabbitmq-dev \
+    procps \
     git \
     mc \
-	net-tools \
-	iputils-ping \
-	python3.11 python3.11-dev \
+    net-tools \
+    iputils-ping \
+    python3.11 python3.11-dev \
     man \
     vim \
     acl \
@@ -36,13 +35,13 @@ RUN apt-get install -y \
     libxml2-dev \
     libzip-dev \
     lua-zlib-dev \
-	libmcrypt-dev \
+    libmcrypt-dev \
     zip \
     unzip \
     curl \
     wget \
-	&& pecl install -n mcrypt \
-	&& docker-php-ext-enable mcrypt \
+    && pecl install -n mcrypt \
+    && docker-php-ext-enable mcrypt \
     && docker-php-ext-install -j$(nproc) bcmath iconv mbstring mysqli pdo pdo_mysql pgsql pdo_pgsql zip exif\
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd 
@@ -68,4 +67,3 @@ USER www
 # Expose port 9000 and start php-fpm server
 EXPOSE 9000
 CMD ["php-fpm"]
-

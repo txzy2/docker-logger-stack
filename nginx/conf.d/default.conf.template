@@ -6,6 +6,10 @@ server {
 	root /var/www/public;
 	
   server_name localhost;
+
+  types {
+    application/x-yaml yaml yml;
+  }
 	   
 	location ~ \.php$ {
         #try_files $uri =404;
