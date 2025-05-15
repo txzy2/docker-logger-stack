@@ -115,6 +115,7 @@ services:
 networks:
   logger_net:
     driver: bridge
+    external: true
 
 volumes:
   grafana_data:
