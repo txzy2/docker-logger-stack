@@ -5,11 +5,7 @@ server {
 	
 	root /var/www/public;
 	
-  server_name localhost;
-
-  types {
-    application/x-yaml yaml yml;
-  }
+  server_name _;
 	   
 	location ~ \.php$ {
         #try_files $uri =404;
@@ -24,10 +20,6 @@ server {
     location / {
         try_files $uri $uri/ /index.php?$query_string;
         gzip_static on;
-    }
-
-    location /docs/ {
-        try_files $uri =404;
     }
 
     location /grafana/ {
