@@ -1,0 +1,126 @@
+version: '3.6'
+
+services:
+
+  #PHP Service
+  logger_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+    container_name: service_app
+    restart: always
+    tty: true
+    environment:
+      SERVICE_NAME: app
+      SERVICE_TAGS: prod
+      TZ: ${TIME_ZONE}
+    working_dir: /var/www/
+    volumes:
+      - ./www/logger/:/var/www
+      - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini  
+    networks:
+      - logger_net
+
+  logger_db:
+    build:
+      context: ./www/pgsql
+      dockerfile: Dockerfile
+      args:
+        DB_VERSION_PG_SQL: ${DB_VERSION_PG_SQL}
+    restart: always
+    container_name: log_db
+    tty: true
+    volumes:
+      - ./dbdata_log_service:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_MULTIPLE_DATABASES=${DB_NAME_GATEWAY}
+      - POSTGRES_USER=${DB_USER_GATEWAY}
+      - POSTGRES_PASSWORD=${DB_PASS_GATEWAY}
+    networks:
+      - logger_net
+
+
+  #Nginx Service
+  logger_webserver:
+    image: nginx:alpine
+    container_name: service_webserver
+    restart: always
+    tty: true
+    ports:
+      - "580:80"
+      # - "5443:443"
+    volumes:
+      - ./www:/var/www
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+      - ./nginx/logs/:/var/log/nginx
+      - ./nginx/ssl/:/etc/nginx/ssl
+      - ./nginx/conf/:/etc/nginx/conf
+    networks:
+      - logger_net
+
+  #ADMINER
+  adminer:
+    image: ${ADMINER_VERSION}
+    container_name: adminer
+    restart: always
+    ports:
+      - ${ADMINER_PORT}:8080
+    networks:
+      - logger_net
+
+  # GRAFANA
+  grafana:
+    image: grafana/grafana
+    container_name: logger_grafana
+    restart: always
+    ports:
+      - "${GRAFANA_PORT}:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASS}
+    depends_on:
+      - loki
+    networks:
+      - logger_net
+
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "${LOKI_PORT}:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - loki_data:/loki
+    networks:
+      - logger_net
+
+  promtail:
+    image: grafana/promtail:latest
+    volumes:
+      - ./promtail-config.yaml:/etc/promtail/config.yml
+      - ./www/logger/storage/logs/:/var/www/storage/logs:ro
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - logger_net
+    depends_on:
+      - loki
+
+networks:
+  logger_net:
+
+volumes:
+  loki_data:
+  grafana_data:
+
+#Docker Networks
+networks:
+  logger_net:
+    driver: bridge
+
+volumes:
+  grafana_data:
+    driver: local
+  loki_data:
+
