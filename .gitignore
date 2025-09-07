@@ -1,2 +1,4 @@
 ./nginx/conf.d/default.conf
 ./nginx/logs/
+loki-data/
+grafana-data/
