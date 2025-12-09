@@ -2,3 +2,5 @@
 ./nginx/logs/
 loki-data/
 grafana-data/
+
+./supervisor/log/

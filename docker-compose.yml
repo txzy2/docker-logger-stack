@@ -38,6 +38,20 @@ services:
     networks:
       - logger_net
 
+  logger_supervisor:
+    build:
+      context: ./supervisor
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - ./www:/var/www
+      - ./supervisor/config:/etc/supervisor
+      - ./supervisor/log:/var/log/supervisor
+    environment:
+      TZ: ${TIME_ZONE}
+      SERVICE_NAME: logger_supervisor
+    networks:
+      - logger_net
 
   #Nginx Service
   logger_webserver:
