@@ -8,7 +8,6 @@ WORKDIR /var/www
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
-    librdkafka-dev \
     exim4 \
     librabbitmq-dev \
     procps \
@@ -33,33 +32,22 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libxml2-dev \
     libzip-dev \
-    lua-zlib-dev \
-    libmcrypt-dev \
     zip \
     unzip \
     curl \
     wget \
-    && pecl install -n mcrypt \
-    && docker-php-ext-enable mcrypt \
-    && docker-php-ext-install -j$(nproc) bcmath iconv mbstring mysqli pdo pdo_mysql pgsql pdo_pgsql zip exif \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && docker-php-ext-install -j$(nproc) \
+        bcmath iconv mbstring mysqli pdo pdo_mysql pgsql pdo_pgsql zip exif \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd \
-    && pecl install rdkafka \
-    && docker-php-ext-enable rdkafka \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # set up mailing
 RUN sed -i 's@local@internet@' /etc/exim4/update-exim4.conf.conf \
   && update-exim4.conf
-
-# Install Node.js v22 and Yarn
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
-    && apt-get update \
-    && apt-get install -y nodejs \
-    && npm install -g yarn \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
 
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
