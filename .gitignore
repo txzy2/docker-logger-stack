@@ -1,6 +1,5 @@
 ./nginx/conf.d/default.conf
 ./nginx/logs/
-loki-data/
-grafana-data/
 
-./supervisor/log/
+redis_data/
+dbdata_log_service/

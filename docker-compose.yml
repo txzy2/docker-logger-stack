@@ -66,11 +66,7 @@ services:
       - ./www/logger:/var/www
       - ./nginx/conf.d/:/etc/nginx/conf.d/
       - ./nginx/logs/:/var/log/nginx
-      - ./nginx/ssl/:/etc/nginx/ssl
       - ./nginx/conf/:/etc/nginx/conf
-    environment:
-    - GRAFANA_PORT=${GRAFANA_PORT}
-    entrypoint: ["/bin/sh", "/etc/nginx/conf/entrypoint.sh"]
     networks:
       - logger_net
 
